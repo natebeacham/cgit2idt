@@ -17,7 +17,7 @@ MINS_RE = re.compile('(?P<num>[0-9]+) min')
 
 def parse_delta(buffer):
 	if ' hours' in buffer:
-		return int(MINS_RE.match(buffer).groupdict()['num']) * 60
+		return int(HOURS_RE.match(buffer).groupdict()['num']) * 60
 	elif ' min' in buffer:
 		return int(MINS_RE.match(buffer).groupdict()['num'])
 
