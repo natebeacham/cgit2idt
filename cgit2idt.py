@@ -1,4 +1,5 @@
 import re
+import json
 import smtplib
 import requests
 
@@ -6,24 +7,10 @@ from bs4 import BeautifulSoup as bs
 from email.mime.text import MIMEText
 from requests.auth import HTTPDigestAuth as auth
 
-TOKEN = '##'
-THRESHOLD = 1440
+config = json.loads(open('config.json').read())
 
-CGIT_URL = 'http://cgit.example.com'
-CGIT_LOG_URL = '%s/repo/log/?h=%%s' % CGIT_URL
-CGIT_PROTECTED = True
-CGIT_CREDS = ('user', 'pass')
-
-TEAM_ADDR = '[your team]@team.idonethis.com'
-
-USER_MAP = {
-	'natebeacham': 'nate@example.com',
-}
-
-BRANCHES = [
-	'master',
-	'newfeature',
-]
+for key, value in config.items():
+	locals()[key] = value
 
 HOURS_RE = re.compile('(?P<num>[0-9]+) hours')
 MINS_RE = re.compile('(?P<num>[0-9]+) min')
@@ -33,8 +20,6 @@ def parse_delta(buffer):
 		return int(MINS_RE.match(buffer).groupdict()['num']) * 60
 	elif ' min' in buffer:
 		return int(MINS_RE.match(buffer).groupdict()['num'])
-
-	return None
 
 for branch in BRANCHES:
 	kwargs = {}
@@ -56,7 +41,7 @@ for branch in BRANCHES:
 
 		author = author.text
 		timestamp = timestamp.find_all('span')[0].text
-		href = '%s%s' % (CGIT_URL, entry.find_all('a')[0].attrs['href'])
+		url = '%s%s' % (CGIT_URL, entry.find_all('a')[0].attrs['href'])
 
 		delta = parse_delta(timestamp)
 
@@ -68,7 +53,9 @@ for branch in BRANCHES:
 		except KeyError:
 			continue
 
-		message = MIMEText(message.replace('##', '') + '\n')
+		message = '%s (%s)' % (message.replace('##', ''), url)
+
+		message = MIMEText(message)
 		message['Subject'] = "RE: What'd you get done"
 		message['From'] = from_
 		message['To'] = TEAM_ADDR
@@ -76,4 +63,3 @@ for branch in BRANCHES:
 		s = smtplib.SMTP('localhost')
 		s.sendmail(from_, [TEAM_ADDR], message.as_string())
 		s.quit()
-

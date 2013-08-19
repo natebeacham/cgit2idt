@@ -1,0 +1,20 @@
+{
+	"TOKEN": "##",
+	"THRESHOLD": 1440,
+
+	"CGIT_URL": "http://cgit.example.com",
+	"CGIT_LOG_URL": "http://cgit.example.com/repo/log/?h=%s",
+	"CGIT_PROTECTED": true,
+	"CGIT_CREDS": ["user", "pass"],
+
+	"TEAM_ADDR": "[your team]@team.idonethis.com",
+
+	"USER_MAP": {
+		"natebeacham": "nate@example.com"
+	},
+
+	"BRANCHES": [
+		"master",
+		"newfeature",
+	]
+}
