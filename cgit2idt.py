@@ -21,6 +21,8 @@ def parse_delta(buffer):
 	elif ' min' in buffer:
 		return int(MINS_RE.match(buffer).groupdict()['num'])
 
+sent = []
+
 for branch in BRANCHES:
 	kwargs = {}
 
@@ -36,7 +38,7 @@ for branch in BRANCHES:
 
 		message = message.find_all('a')[0].text
 
-		if TOKEN not in message:
+		if TOKEN not in message or message in sent:
 			continue
 
 		author = author.text
@@ -52,6 +54,8 @@ for branch in BRANCHES:
 			from_ = USER_MAP[author]
 		except KeyError:
 			continue
+
+		sent.append(message)
 
 		message = '%s (%s)' % (message.replace('##', ''), url)
 
